@@ -1,5 +1,6 @@
 import ComplaintForm from "../components/features/complaint/ComplaintForm";
 import AICopilot from "../components/features/complaint/AICopilot";
+import RiskAssessment from "../components/features/complaint/RiskAssessment";
 
 import { useComplaint } from "../context/ComplaintContext";
 
@@ -13,18 +14,9 @@ function ComplaintDashboardPage() {
   } = useComplaint();
 
 
-
-  console.log(
-    "DASHBOARD COMPLAINT DATA:",
-    complaint
-  );
-
-
-
-
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-stone-100 via-olive-50 to-stone-100 p-6">
 
 
       <div className="mx-auto max-w-[1600px]">
@@ -57,7 +49,7 @@ function ComplaintDashboardPage() {
 
 
 
-          <div className="col-span-7">
+          <div className="col-span-7 space-y-6">
 
 
             <div className="rounded-2xl shadow-lg overflow-hidden">
@@ -71,6 +63,9 @@ function ComplaintDashboardPage() {
 
 
             </div>
+
+
+            <RiskAssessment />
 
 
           </div>

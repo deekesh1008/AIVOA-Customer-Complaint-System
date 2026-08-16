@@ -5,7 +5,7 @@ from app.core.config import settings
 
 base_llm = ChatGroq(
 
-    model="llama-3.3-70b-versatile",
+    model="llama-3.1-8b-instant",
 
     api_key=settings.groq_api_key,
 

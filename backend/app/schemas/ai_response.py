@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional , Any
 
 from pydantic import BaseModel
 
@@ -19,7 +19,8 @@ class ComplaintData(BaseModel):
 
     expiry_date: Optional[str] = None
 
-    quantity_affected: Optional[str] = None
+   
+    quantity_affected: Optional[Any] = None
 
     complaint_type: Optional[str] = None
 
@@ -34,5 +35,6 @@ class ComplaintData(BaseModel):
 
 
 class AIComplaintResponse(BaseModel):
-
+    is_valid_complaint: Optional[bool] = True
+    invalid_reason: Optional[str] = None
     complaint: ComplaintData

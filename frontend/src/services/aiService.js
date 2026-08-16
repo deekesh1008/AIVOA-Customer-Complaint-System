@@ -19,7 +19,7 @@ export const processAIFile = async (file) => {
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": undefined,
       },
     }
   );
@@ -27,3 +27,9 @@ export const processAIFile = async (file) => {
 
   return response.data;
 };
+
+
+export const analyzeComplaintData = async (complaint) => {
+  const response = await api.post("/ai/analyze", { complaint });
+  return response.data;
+};

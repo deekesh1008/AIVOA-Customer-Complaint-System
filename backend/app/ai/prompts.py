@@ -8,13 +8,16 @@ Available intents:
 1. log_complaint
 
 Use when:
-- User provides a new complaint.
+- User provides a new complaint or partial complaint information (e.g., product name, batch number, customer name, quantity, received batch).
 - User wants to create/register a complaint.
-- User describes a new product quality issue.
+- User describes a product quality issue.
 
 Examples:
 "Create a complaint for Amoxicillin capsules."
 "Apollo Pharmacy reported damaged tablets."
+"Product is Metformin 500mg API."
+"Batch number is LOT-2026-X99-A."
+"Product Metformin API batch B-101 received on 05/06/2026."
 "Log this customer complaint."
 
 
@@ -79,6 +82,18 @@ Use ONLY the information available in the provided source.
 Do not use external knowledge.
 Do not assume missing information.
 Do not create fake factual details.
+
+
+Document Validation Rules:
+If the source text is unreadable, corrupted, or completely unrelated to a customer complaint or pharmaceutical product (e.g., resume, office receipt, general article, weather query):
+- Set "is_valid_complaint": false
+- Set "invalid_reason": "The input text/document does not contain any pharmaceutical complaint or product quality details."
+- Set all fields under "complaint" to null.
+
+If the source contains ANY pharmaceutical complaint, product name, batch number, customer name, quantity, or quality issue (even if partial or incomplete):
+- Set "is_valid_complaint": true
+- Set "invalid_reason": null
+- Extract all available fields into "complaint" and leave missing fields as null. Do NOT invent missing fields.
 
 
 Extraction rules:
@@ -201,6 +216,8 @@ Return only valid JSON.
 Required output format:
 
 {
+    "is_valid_complaint": true,
+    "invalid_reason": null,
     "complaint": {
 
         "complaint_source": null,
@@ -298,7 +315,17 @@ You are an expert pharmaceutical quality document extraction assistant.
 Your task is to extract complaint information from uploaded documents such as:
 - customer complaint PDFs
 - complaint emails
-- quality issue reports
+- document photos / live camera capture images
+- handwritten quality notes & handwritten complaint forms
+
+Document Validation Rules:
+- Mark "is_valid_complaint": true for ANY text or photo transcription containing a customer complaint, damaged product report, handwritten paper note, email, or quality issue report.
+- Only set "is_valid_complaint": false if the text is completely empty, gibberish, or entirely unrelated to a product or customer complaint (e.g. resume, office receipt, random picture).
+
+Confusing or Ambiguous Handwriting / Text Detection:
+If the transcribed text from handwritten notes contains ambiguous, blurry, or unreadable pen characters (e.g. poorly written numbers/dates/batch numbers):
+- Set "ambiguous_details": "Short summary of what handwritten details look ambiguous or hard to read (e.g. 'The handwritten batch number is unclear and could be BAC200 or BAC209')."
+Otherwise set "ambiguous_details": null.
 
 Rules:
 
@@ -376,6 +403,9 @@ Minor quality issue.
 Return only JSON:
 
 {
+    "is_valid_complaint": true,
+    "invalid_reason": null,
+    "ambiguous_details": null,
     "complaint": {
 
         "complaint_source": null,
@@ -403,10 +433,8 @@ Return only JSON:
         "initial_severity": null,
 
         "priority": null
+
     }
+
 }
-
-
-No explanation.
-No markdown.
 """

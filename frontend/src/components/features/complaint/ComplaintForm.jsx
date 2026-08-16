@@ -1,23 +1,24 @@
 import { useState } from "react";
+import { CheckCircle2, RefreshCw, Save, Sparkles, ShieldCheck } from "lucide-react";
 
 import { saveComplaint } from "../../../services/complaintService";
+import { useComplaint } from "../../../context/ComplaintContext";
 
 
 function ComplaintForm({
   complaint = {},
 }) {
 
-
-  console.log(
-    "FORM COMPLAINT DATA:",
-    complaint
-  );
-
-
-
+  const { setComplaint, setRiskAssessment, setMessages } = useComplaint();
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(null);
 
-
+  const handleResetForm = () => {
+    setComplaint({});
+    setRiskAssessment(null);
+    if (setMessages) setMessages([]);
+    setSaveSuccess(null);
+  };
 
   const handleSaveComplaint = async () => {
 
@@ -31,10 +32,12 @@ function ComplaintForm({
       );
 
 
-      alert(
-        `Complaint saved successfully. Complaint ID: ${response.complaint_id}`
-      );
+      setSaveSuccess({
+        complaint_id: response.complaint_id,
+        timestamp: new Date().toLocaleTimeString(),
+      });
 
+      handleResetForm();
 
     } catch (error) {
 
@@ -43,7 +46,7 @@ function ComplaintForm({
 
 
       alert(
-        "Failed to save complaint"
+        "Failed to save complaint. Please try again."
       );
 
 
@@ -129,7 +132,33 @@ function ComplaintForm({
 
   return (
 
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xl">
+    <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-xl">
+
+      {/* SUCCESS MESSAGE BANNER */}
+      {saveSuccess && (
+        <div className="mb-6 rounded-2xl border-2 border-emerald-400 bg-emerald-50/90 p-5 shadow-lg flex items-center justify-between animate-in fade-in duration-300">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md">
+              <ShieldCheck size={26} />
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-emerald-950">
+                Your Complaint Has Been Successfully Sent & Saved!
+              </h3>
+              <p className="text-xs font-semibold text-emerald-800 mt-1 leading-relaxed">
+                Complaint Reference ID: <span className="rounded bg-emerald-200/80 px-2 py-0.5 font-black text-emerald-950 border border-emerald-300">#{saveSuccess.complaint_id}</span> • Form reset for new intake.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleResetForm}
+            className="flex items-center gap-2 rounded-xl bg-emerald-700 px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-emerald-800 transition"
+          >
+            <RefreshCw size={14} /> Make Another Complaint
+          </button>
+        </div>
+      )}
 
 
       <div className="flex items-start justify-between border-b pb-5">
@@ -137,16 +166,16 @@ function ComplaintForm({
 
         <div>
 
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
 
             Log Customer Complaint
 
           </h1>
 
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-1.5 text-sm font-semibold text-gray-600">
 
-            API & FDF Quality Assurance Module
+            API & FDF Quality Assurance Module • AI Form Population
 
           </p>
 
@@ -156,7 +185,7 @@ function ComplaintForm({
 
 
 
-        <span className="rounded-full border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-700">
+        <span className="rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-xs font-extrabold text-amber-800 shadow-sm">
 
           Pending Triage
 
@@ -247,7 +276,7 @@ function ComplaintForm({
           <div className="col-span-2">
 
 
-            <label className="mb-2 block text-sm font-semibold text-gray-700">
+            <label className="mb-2 block text-sm font-extrabold text-gray-900">
 
               Detailed Complaint Description
 
@@ -264,9 +293,9 @@ function ComplaintForm({
 
               rows="4"
 
-              placeholder="Awaiting AI extraction..."
+              placeholder="Awaiting AI extraction from document, handwriting photo, or chat..."
 
-              className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none"
+              className="w-full rounded-xl border-2 border-gray-300 bg-stone-50 px-4 py-3 text-base font-bold text-gray-900 outline-none cursor-default shadow-inner placeholder:font-normal placeholder:text-gray-400"
 
             />
 
@@ -317,11 +346,15 @@ function ComplaintForm({
 
         <button
 
-          className="rounded-xl border border-gray-300 px-6 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          type="button"
+
+          onClick={handleResetForm}
+
+          className="flex items-center gap-2 rounded-xl border border-gray-400 bg-white px-6 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-100 transition shadow-sm"
 
         >
 
-          Reset Form
+          <RefreshCw size={16} /> Reset Form
 
         </button>
 
@@ -334,11 +367,17 @@ function ComplaintForm({
 
           disabled={saving}
 
-          className="rounded-xl bg-blue-600 px-7 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl bg-olive-700 px-8 py-3 text-sm font-black text-white shadow-lg transition hover:bg-olive-800 disabled:opacity-50"
 
         >
 
-          {saving ? "Saving..." : "Save Complaint"}
+          {saving ? (
+            "Saving..."
+          ) : (
+            <>
+              <Save size={18} /> Save & Submit Complaint
+            </>
+          )}
 
         </button>
 
@@ -361,10 +400,10 @@ function Section({ title, children }) {
 
   return (
 
-    <div className="mt-8 rounded-xl border border-gray-100 bg-gray-50/50 p-5">
+    <div className="mt-8 rounded-xl border border-gray-200 bg-stone-50/60 p-5 shadow-sm">
 
 
-      <h2 className="mb-5 text-sm font-bold uppercase tracking-wide text-blue-700">
+      <h2 className="mb-5 text-sm font-black uppercase tracking-wider text-olive-950 border-l-4 border-olive-700 pl-3">
 
         {title}
 
@@ -386,7 +425,7 @@ function Section({ title, children }) {
 
 function InputField({
   label,
-  value
+  value,
 }) {
 
 
@@ -395,7 +434,7 @@ function InputField({
     <div>
 
 
-      <label className="mb-2 block text-sm font-semibold text-gray-700">
+      <label className="mb-2 block text-sm font-extrabold text-gray-900">
 
         {label}
 
@@ -407,14 +446,16 @@ function InputField({
 
         readOnly
 
+        type="text"
+
         value={value || ""}
 
         placeholder="Awaiting AI extraction..."
 
-        className={`w-full rounded-xl border px-4 py-2.5 text-sm outline-none ${
+        className={`w-full rounded-xl border-2 px-4 py-3 text-base outline-none cursor-default font-bold transition-all shadow-sm ${
           value
-            ? "border-blue-200 bg-blue-50 text-gray-900"
-            : "border-gray-300 bg-gray-50 text-gray-400"
+            ? "border-olive-500 bg-white text-gray-950"
+            : "border-gray-300 bg-stone-50 text-gray-400 font-normal"
         }`}
 
       />
@@ -428,4 +469,4 @@ function InputField({
 
 
 
-export default ComplaintForm;
+export default ComplaintForm;

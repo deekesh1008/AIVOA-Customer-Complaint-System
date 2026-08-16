@@ -1,10 +1,13 @@
 import os
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.ai.graph import graph
+from app.ai.risk import generate_risk_assessment
+from app.db.database import get_db
 from app.utils.document_parser import extract_document_text
 
 
@@ -27,6 +30,9 @@ class AIProcessRequest(BaseModel):
     complaint: dict[str, Any] | None = None
 
 
+class AIAnalyzeRequest(BaseModel):
+
+    complaint: dict[str, Any]
 
 
 
@@ -53,7 +59,8 @@ def remove_empty_values(data: dict):
 
 @router.post("/process")
 async def process_ai(
-    request: AIProcessRequest
+    request: AIProcessRequest,
+    db: Session = Depends(get_db)
 ):
 
     try:
@@ -86,7 +93,14 @@ async def process_ai(
 
         result = graph.invoke(state)
 
+        complaint_data = remove_empty_values(
+            result.get("complaint", {})
+        )
 
+        risk_assessment = generate_risk_assessment(
+            complaint_data,
+            db_session=db
+        )
 
 
         return {
@@ -98,12 +112,7 @@ async def process_ai(
             "data": {
 
 
-                "complaint": remove_empty_values(
-                    result.get(
-                        "complaint",
-                        {}
-                    )
-                ),
+                "complaint": complaint_data,
 
 
                 "assistant_response": result.get(
@@ -116,6 +125,9 @@ async def process_ai(
                     "intent",
                     ""
                 ),
+
+
+                "risk_assessment": risk_assessment,
 
 
             }
@@ -148,7 +160,8 @@ async def process_ai(
 
 @router.post("/upload")
 async def upload_document(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
 ):
 
     try:
@@ -191,11 +204,15 @@ async def upload_document(
 
 
             "user_message":
-            "Extract complaint details from uploaded document",
+            f"Extract complaint details from uploaded document: {file.filename}",
 
 
             "uploaded_document":
             document_text,
+
+
+            "filename":
+            file.filename,
 
 
             "intent":
@@ -219,7 +236,14 @@ async def upload_document(
 
         result = graph.invoke(state)
 
+        complaint_data = remove_empty_values(
+            result.get("complaint", {})
+        )
 
+        risk_assessment = generate_risk_assessment(
+            complaint_data,
+            db_session=db
+        )
 
 
         return {
@@ -231,12 +255,7 @@ async def upload_document(
             "data": {
 
 
-                "complaint": remove_empty_values(
-                    result.get(
-                        "complaint",
-                        {}
-                    )
-                ),
+                "complaint": complaint_data,
 
 
                 "assistant_response": result.get(
@@ -251,6 +270,9 @@ async def upload_document(
                 ),
 
 
+                "risk_assessment": risk_assessment,
+
+
             }
 
 
@@ -262,6 +284,47 @@ async def upload_document(
 
     except Exception as e:
 
+
+        raise HTTPException(
+
+            status_code=500,
+
+            detail=str(e)
+
+        )
+
+
+
+
+
+
+
+@router.post("/analyze")
+async def analyze_complaint(
+    request: AIAnalyzeRequest,
+    db: Session = Depends(get_db)
+):
+
+    try:
+
+        risk_assessment = generate_risk_assessment(
+            request.complaint or {},
+            db_session=db
+        )
+
+        return {
+
+            "success": True,
+
+            "data": {
+
+                "risk_assessment": risk_assessment
+
+            }
+
+        }
+
+    except Exception as e:
 
         raise HTTPException(
 

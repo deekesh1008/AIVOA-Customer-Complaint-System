@@ -29,6 +29,7 @@ function ChatBox({
     setMessages,
     loading,
     setLoading,
+    setRiskAssessment,
   } = useComplaint();
 
 
@@ -75,6 +76,10 @@ function ChatBox({
 
 
     setComplaint(complaintData);
+
+    if (response?.data?.risk_assessment) {
+      setRiskAssessment(response.data.risk_assessment);
+    }
 
 
 
@@ -312,7 +317,7 @@ function ChatBox({
 
 
 
-      <div className="flex items-center gap-3 border-b bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 text-white">
+      <div className="flex items-center gap-3 border-b bg-gradient-to-r from-olive-700 to-olive-900 px-5 py-4 text-white">
 
 
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
@@ -332,7 +337,7 @@ function ChatBox({
           </h3>
 
 
-          <p className="text-xs text-blue-100">
+          <p className="text-xs text-olive-100">
 
             Ready to analyze complaint documents
 
@@ -388,7 +393,7 @@ function ChatBox({
 
             {msg.role === "assistant" && (
 
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-olive-100 text-olive-800">
 
                 <Bot size={20}/>
 
@@ -402,13 +407,13 @@ function ChatBox({
 
             <div
 
-              className={`max-w-[80%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                
+              className={`max-w-[85%] whitespace-pre-line rounded-2xl px-4.5 py-3 text-sm leading-relaxed shadow-sm ${
+
                 msg.role === "user"
 
-                ? "bg-blue-600 text-white"
+                ? "bg-olive-800 text-white font-semibold"
 
-                : "border bg-white text-gray-700"
+                : "border border-gray-200 bg-white text-gray-900 font-medium"
 
               }`}
 
@@ -425,7 +430,7 @@ function ChatBox({
 
             {msg.role === "user" && (
 
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-olive-100 text-olive-800">
 
                 <UserRound size={20}/>
 
@@ -449,7 +454,7 @@ function ChatBox({
           <div className="flex gap-3">
 
 
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-olive-100 text-olive-800">
 
               <Bot size={20}/>
 
@@ -541,7 +546,7 @@ function ChatBox({
 
             placeholder="Ask or update complaint details..."
 
-            className="flex-1 rounded-xl border px-4 py-3 text-sm outline-none focus:border-blue-500"
+            className="flex-1 rounded-xl border px-4 py-3 text-sm outline-none focus:border-olive-500 focus:ring-1 focus:ring-olive-500"
 
           />
 
@@ -553,7 +558,7 @@ function ChatBox({
 
             onClick={handleSend}
 
-            className="rounded-xl bg-blue-600 p-3 text-white hover:bg-blue-700"
+            className="rounded-xl bg-olive-600 p-3 text-white hover:bg-olive-700 transition-colors"
 
           >
 

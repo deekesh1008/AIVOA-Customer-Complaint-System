@@ -8,10 +8,12 @@ class ComplaintState(TypedDict, total=False):
 
     uploaded_document: Optional[str]
 
+    filename: Optional[str]
+
     intent: Optional[str]
 
     complaint: Dict[str, Any]
 
     assistant_response: str
 
-    error: Optional[str]
+    error: Optional[str]

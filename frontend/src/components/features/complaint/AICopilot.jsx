@@ -19,6 +19,7 @@ function AICopilot() {
   const {
     complaint,
     updateComplaint,
+    setRiskAssessment,
     setMessages,
     setLoading,
   } = useComplaint();
@@ -63,6 +64,10 @@ function AICopilot() {
         response.data?.complaint || {}
 
       );
+
+      if (response.data?.risk_assessment) {
+        setRiskAssessment(response.data.risk_assessment);
+      }
 
 
 
@@ -141,7 +146,7 @@ function AICopilot() {
 
 
 
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 text-white">
+      <div className="bg-gradient-to-r from-olive-700 to-olive-900 px-6 py-5 text-white">
 
 
         <h2 className="text-2xl font-bold">
@@ -151,7 +156,7 @@ function AICopilot() {
         </h2>
 
 
-        <p className="mt-2 text-sm text-blue-100">
+        <p className="mt-2 text-sm text-olive-100">
 
           Extract, analyze and update pharmaceutical complaints using AI
 
@@ -168,7 +173,7 @@ function AICopilot() {
 
 
 
-        <div className="rounded-xl border border-dashed border-blue-300 bg-blue-50 p-5">
+        <div className="rounded-xl border border-dashed border-olive-300 bg-olive-50/60 p-5">
 
 
           <FileUpload
@@ -212,7 +217,7 @@ function AICopilot() {
 
           onClick={() => setShowTextModal(true)}
 
-          className="w-full rounded-xl border border-gray-300 bg-white py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:border-blue-400"
+          className="w-full rounded-xl border border-gray-300 bg-white py-3 text-sm font-medium text-gray-700 transition hover:bg-olive-50 hover:border-olive-400 hover:text-olive-800"
 
         >
 
@@ -292,7 +297,7 @@ function AICopilot() {
               rows={10}
 
 
-              className="mt-5 w-full rounded-xl border border-gray-300 p-4 outline-none focus:border-blue-500"
+              className="mt-5 w-full rounded-xl border border-gray-300 p-4 outline-none focus:border-olive-500 focus:ring-1 focus:ring-olive-500"
 
 
             />
@@ -331,7 +336,7 @@ function AICopilot() {
 
                 onClick={handleTextSubmit}
 
-                className="rounded-xl bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                className="rounded-xl bg-olive-600 px-6 py-2 text-white hover:bg-olive-700 transition-colors"
 
               >
 
